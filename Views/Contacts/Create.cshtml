@@ -1,0 +1,28 @@
+﻿
+    @model ContactManagerB.Models.Contact
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <title>添加联系人</title>
+        <link rel="stylesheet" href="~/css/site.css">
+    </head>
+    <body>
+        <h1>添加联系人</h1>
+        <form asp-action="Create" method="post">
+            <label for="Name">姓名:</label>
+            <input type="text" id="Name" name="Name" required />
+
+            <label for="Address">住址:</label>
+            <input type="text" id="Address" name="Address" />
+
+            <label for="Phone">电话:</label>
+            <input type="text" id="Phone" name="Phone" />
+
+            <button type="submit">添加</button>
+        </form>
+    </body>
+    </html>
+
+

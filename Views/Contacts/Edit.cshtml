@@ -1,0 +1,23 @@
+﻿@model ContactManagerB.Models.Contact
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑联系人</title>
+</head>
+<body>
+    <h1>编辑联系人</h1>
+    <form asp-action="Edit" asp-controller="Contacts" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <label for="name">姓名:</label>
+        <input type="text" name="Name" value="@Model.Name" required />
+        <label for="address">住址:</label>
+        <input type="text" name="Address" value="@Model.Address" required />
+        <label for="phone">电话:</label>
+        <input type="text" name="Phone" value="@Model.Phone" required />
+        <button type="submit">保存</button>
+    </form>
+</body>
+</html>

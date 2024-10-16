@@ -1,0 +1,119 @@
+﻿@model IEnumerable<ContactManagerB.Models.Contact>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>联系人列表</title>
+    <link rel="stylesheet" href="~/css/site.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <h1>联系人列表</h1>
+    <!-- 查询表单 -->
+    <div>
+        <input type="text" id="searchName" placeholder="输入联系人姓名" />
+        <button id="searchBtn">查询</button>
+    </div>
+    <a href="@Url.Action("Create", "Contacts")">添加联系人</a>
+    <table>
+        <thead>
+            <tr>
+                <th>姓名</th>
+                <th>住址</th>
+                <th>电话</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in Model)
+            {
+                <tr>
+                    <td>@contact.Name</td>
+                    <td>@contact.Address</td>
+                    <td>@contact.Phone</td>
+                    <td>
+                        <a href="@Url.Action("Edit", "Contacts", new { id = contact.Id })">编辑</a>
+@*                         <form asp-action="Delete" asp-controller="Contacts" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken() <!-- 防止CSRF -->
+                            <input type="hidden" name="id" value="@contact.Id" />
+                            <button type="submit" onclick="return confirm('确定要删除此联系人吗？');">删除</button>
+                        </form> *@
+                        <button class="delete-btn" data-id="@contact.Id">删除</button>
+                    </td>
+                    @* <td>
+                        <button class="delete-btn" data-id="@contact.Id">删除</button>
+                    </td> *@
+                </tr>
+            }
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const contactId = this.getAttribute('data-id');
+
+                    if (confirm('确定要删除此联系人吗？')) {
+                        fetch('/Contacts/Delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRF-TOKEN': $('input[name="__RequestVerificationToken"]').val() // CSRF token
+                            },
+                            body: new URLSearchParams({ 'id': contactId })
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    // 成功后，移除表格中的对应行
+                                    this.closest('tr').remove();
+                                    alert('联系人已删除');
+                                } else {
+                                    throw new Error('删除联系人失败');
+                                }
+                            })
+                            .catch(error => alert(error));
+                    }
+                });
+            });
+        });
+        $(document).ready(function () {
+            // 查询功能
+            $('#searchBtn').click(function () {
+                var searchName = $('#searchName').val();
+                if (searchName) {
+                    $.ajax({
+                        url: '/Contacts/Search',  // 确保URL正确
+                        type: 'GET',
+                        data: { name: searchName },
+                        success: function (result) {
+                            $('#contactListBody').empty(); // 清空现有联系人列表
+                            result.forEach(contact => {
+                                $('#contactListBody').append(`
+                                        <tr>
+                                            <td>${contact.name}</td>
+                                            <td>${contact.address}</td>
+                                            <td>${contact.phone}</td>
+                                            <td>
+                                                <button class="delete-btn" data-id="${contact.id}">删除</button>
+                                            </td>
+                                        </tr>
+                                    `);
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            alert('查询联系人失败: ' + error);
+                        }
+                    });
+                } else {
+                    alert('请输入联系人姓名');
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
